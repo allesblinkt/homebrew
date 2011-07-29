@@ -17,6 +17,10 @@ def use_lqr?
   ARGV.include? '--use-lqr'
 end
 
+def use_exr?
+  ARGV.include? '--use-exr'
+end
+
 def disable_openmp?
   ARGV.include? '--disable-openmp'
 end
@@ -24,6 +28,27 @@ end
 def magick_plus_plus?
     ARGV.include? '--with-magick-plus-plus'
 end
+
+def magick_plus_plus?
+    ARGV.include? '--with-magick-plus-plus'
+end
+
+def quantum_depth_8?
+    ARGV.include? '--with-quantum-depth=8'
+end
+
+def quantum_depth_16?
+    ARGV.include? '--with-quantum-depth=16'
+end
+
+def quantum_depth_32?
+    ARGV.include? '--with-quantum-depth=32'
+end
+
+def enable_hdri?
+    ARGV.include? '--enable-hdri'
+end
+
 
 class Imagemagick < Formula
   # Using an unofficial Git mirror to work around:
@@ -44,6 +69,7 @@ class Imagemagick < Formula
 
   depends_on 'libwmf' if use_wmf?
   depends_on 'liblqr' if use_lqr?
+  depends_on 'openexr' if use_exr?
 
   def skip_clean? path
     path.extname == '.la'
@@ -54,6 +80,11 @@ class Imagemagick < Formula
       ['--with-ghostscript', 'Compile against ghostscript (not recommended.)'],
       ['--use-wmf', 'Compile with libwmf support.'],
       ['--use-lqr', 'Compile with liblqr support.'],
+      ['--use-exr', 'Compile with openexr support.'],
+      ['--with-quantum-depth=8', 'Compile with a quantum depth (bits per pixel) of 8 bit.'],
+      ['--with-quantum-depth=16', 'Compile with a quantum depth (bits per pixel) of 16 bit.'],
+      ['--with-quantum-depth=32', 'Compile with a quantum depth (bits per pixel) of 32 bit.'],
+      ['--enable-hdri', 'Compile with HDRI support enabled.'],
       ['--disable-openmp', 'Disable OpenMP.'],
       ['--with-magick-plus-plus', 'Compile with C++ interface.']
     ]
@@ -76,6 +107,10 @@ class Imagemagick < Formula
     args << "--with-gs-font-dir=#{HOMEBREW_PREFIX}/share/ghostscript/fonts" \
                 unless ghostscript_srsly? or ghostscript_fonts?
     args << "--without-magick-plus-plus" unless magick_plus_plus?
+    args << "--with-quantum-depth=8" if quantum_depth_8?
+    args << "--with-quantum-depth=16" if quantum_depth_16?
+    args << "--with-quantum-depth=32" if quantum_depth_32?
+    args << "--enable-hdri=yes" if enable_hdri?
 
     # versioned stuff in main tree is pointless for us
     inreplace 'configure', '${PACKAGE_NAME}-${PACKAGE_VERSION}', '${PACKAGE_NAME}'
